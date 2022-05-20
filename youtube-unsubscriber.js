@@ -8,7 +8,7 @@ function myTimer() {
 
     if (i < els.length) {
 
-        els[i].querySelector("[aria-label^='Unsubscribe from']").click();
+        els[i].querySelector(".ytd-subscribe-button-renderer").click();
 
         setTimeout(function () {
 
