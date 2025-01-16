@@ -1,72 +1,37 @@
-var i = 0;
+let unsubedItems = 0;
+let confirmButtonIntervalTime = 500;
+let intevalTime = 1000; // This should not be lower than confirmButtonIntervalTime
+const interval = setInterval(unsubscribe_load, intevalTime);
 
-var myVar = setInterval(myTimer, 3000);
+function unsubscribe_load() {
+  const chanels = document
+    .getElementById("grid-container")
+    .getElementsByClassName("ytd-expanded-shelf-contents-renderer");
 
-function myTimer() {
-
-    var els = document.getElementById("grid-container").getElementsByClassName("ytd-expanded-shelf-contents-renderer");
-
-    if (i < els.length) {
-
-        els[i].querySelector(".ytd-subscribe-button-renderer").click();
-
-        setTimeout(function() {
-
-            var i = 0;
-
-            var myVar = setInterval(myTimer, 3000);
-
-            function myTimer() {
-
-                var els = document.getElementById("grid-container").getElementsByClassName("ytd-expanded-shelf-contents-renderer");
-
-                if (i < els.length) {
-
-                    els[i].querySelector("[aria-label^='Unsubscribe from']").click();
-
-                    setTimeout(function() {
-
-                        var confirmButton = document.getElementById("confirm-button");
-                        if (confirmButton) {
-                            var button = confirmButton.querySelector("yt-button-shape button");
-                            if (button) {
-                                button.click();
-                            }
-                        }
-
-
-                    }, 2000);
-
-                    setTimeout(function() {
-
-                        els[i].parentNode.removeChild(els[i]);
-
-                    }, 2000);
-
-                }
-
-                i++;
-
-                console.log(i + " Channels Unsubscribed\n");
-
-                console.log(els.length + " remaining");
-
+  if (unsubedItems < chanels.length) {
+    chanels[unsubedItems].querySelector(".ytd-subscribe-button-renderer").click();
+        
+        if (unsubedItems < chanels.length) {
+          console.log(chanels[unsubedItems].getElementsByClassName("ytd-channel-name")[0].innerText);
+          const unsubscribeButton = chanels[unsubedItems].querySelector("[aria-label^='Unsubscribe from']");
+          if(unsubscribeButton){
+            unsubscribeButton.click();
+          }
+          
+          setTimeout(function () {
+            const confirmButton = document.getElementById("confirm-button");
+            if (confirmButton) {
+              const button = confirmButton.querySelector(
+                "yt-button-shape button"
+              );
+              if (button) {
+                button.click();
+              }
             }
-
-        }, 2000);
-
-        setTimeout(function() {
-
-            els[i].parentNode.removeChild(els[i]);
-
-        }, 2000);
-
-    }
-
-    i++;
-
-    console.log(i + " Channels Unsubscribed\n");
-
-    console.log(els.length + " remaining");
-
+          }, confirmButtonIntervalTime);
+        }
+  }
+  unsubedItems++;
+  console.log(unsubedItems + " Channels Unsubscribed\n");
+  console.log(chanels.length + " remaining");
 }
