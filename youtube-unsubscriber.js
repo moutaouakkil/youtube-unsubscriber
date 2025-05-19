@@ -1,37 +1,40 @@
-let unsubedItems = 0;
-let confirmButtonIntervalTime = 500;
-let intevalTime = 1000; // This should not be lower than confirmButtonIntervalTime
-const interval = setInterval(unsubscribe_load, intevalTime);
+(async function () {
+  const UNSUBSCRIBE_DELAY = 1000;
 
-function unsubscribe_load() {
-  const chanels = document
-    .getElementById("grid-container")
-    .getElementsByClassName("ytd-expanded-shelf-contents-renderer");
+  // helper function to wait for a specified time
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  if (unsubedItems < chanels.length) {
-    chanels[unsubedItems].querySelector(".ytd-subscribe-button-renderer").click();
-        
-        if (unsubedItems < chanels.length) {
-          console.log(chanels[unsubedItems].getElementsByClassName("ytd-channel-name")[0].innerText);
-          const unsubscribeButton = chanels[unsubedItems].querySelector("[aria-label^='Unsubscribe from']");
-          if(unsubscribeButton){
-            unsubscribeButton.click();
-          }
-          
-          setTimeout(function () {
-            const confirmButton = document.getElementById("confirm-button");
-            if (confirmButton) {
-              const button = confirmButton.querySelector(
-                "yt-button-shape button"
-              );
-              if (button) {
-                button.click();
-              }
-            }
-          }, confirmButtonIntervalTime);
+  // function to click the unsubscribe button
+  const clickUnsubscribe = async (channel) => {
+    try {
+      // click the "Subscribed" button
+      const subscribeButton = channel.querySelector('ytd-subscribe-button-renderer button');
+      if (subscribeButton) {
+        subscribeButton.click();
+        await wait(UNSUBSCRIBE_DELAY);
+
+        // click the confirmation "Unsubscribe" button
+        const confirmButton = document.querySelector('yt-confirm-dialog-renderer #confirm-button button');
+        if (confirmButton) {
+          confirmButton.click();
+          await wait(UNSUBSCRIBE_DELAY);
+          console.log(`Unsubscribed from: ${channel.querySelector('#channel-title').innerText}`);
         }
-  }
-  unsubedItems++;
-  console.log(unsubedItems + " Channels Unsubscribed\n");
-  console.log(chanels.length + " remaining");
-}
+      }
+    } catch (error) {
+      console.error('Error unsubscribing from channel:', error);
+    }
+  };
+
+  // main function to iterate through channels and unsubscribe
+  const unsubscribeAll = async () => {
+    const channels = Array.from(document.querySelectorAll('ytd-channel-renderer'));
+    for (const channel of channels) {
+      await clickUnsubscribe(channel);
+    }
+    console.log('Unsubscription process completed.');
+  };
+
+  // execute the unsubscribe function
+  unsubscribeAll();
+})();
